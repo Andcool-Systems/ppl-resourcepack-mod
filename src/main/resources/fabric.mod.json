@@ -13,8 +13,11 @@
 	"icon": "assets/ppl/icon.png",
 	"environment": "client",
 	"entrypoints": {
-		"client": [
+		"main": [
 			"com.andcool.Main"
+		],
+		"client": [
+			"com.andcool.MainClient"
 		],
 		"modmenu": [
 			"com.andcool.options.ModMenuIntegration"
