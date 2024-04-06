@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "pepeland_resourcepack",
+	"version": "${version}",
+	"name": "Pepeland resourcepack",
+	"description": "Auto-update of the Pepeland resource pack",
+	"authors": [
+		"AndcoolSystems"
+	],
+	"contact": {
+		"homepage": "https://pepeland.net/"
+	},
+	"icon": "assets/ppl/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"com.andcool.Main"
+		],
+		"modmenu": [
+			"com.andcool.options.ModMenuIntegration"
+		]
+	},
+	"mixins": [
+		"ppl.mixin.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.22",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"yet_another_config_lib_v3": "*"
+	}
+}
