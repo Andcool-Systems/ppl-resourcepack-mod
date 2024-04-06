@@ -10,7 +10,6 @@ import net.minecraft.resource.ResourcePackProfile;
 
 import java.io.File;
 import java.util.zip.ZipException;
-import com.andcool.Main;
 
 @Environment(EnvType.CLIENT)
 public class rpManager {
@@ -25,7 +24,7 @@ public class rpManager {
         MinecraftClient.getInstance().reloadResourcesConcurrently();
     }
 
-    public static void delete(String path){
+    public static void delete(String path) {
         File file = new File(path);
         if (file.delete()) {
             MainClient.LOGGER.info("Deleted old resourcepack");

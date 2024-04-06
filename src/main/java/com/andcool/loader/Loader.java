@@ -1,29 +1,31 @@
 package com.andcool.loader;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import com.andcool.MainClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.json.JSONObject;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-
-import com.andcool.MainClient;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import org.json.JSONObject;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @Environment(EnvType.CLIENT)
 public class Loader {
-    public static void download_file(String fileURL, String saveDir) throws IOException {
+    /*
+    Download file from URL
+     */
+    public static void download_file(String fileURL, String saveDir, String filename) throws IOException {
         URL url = new URL(fileURL);
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         int responseCode = httpConn.getResponseCode();
 
-        String saveFilePath = saveDir + File.separator + "pepeland.zip";
+        String saveFilePath = saveDir + File.separator + filename;
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
 
@@ -31,7 +33,7 @@ public class Loader {
             FileOutputStream outputStream = new FileOutputStream(saveFilePath);
 
             int bytesRead;
-            byte[] buffer = new byte[4096];
+            byte[] buffer = new byte[1024];
             while ((bytesRead = inputStream.read(buffer)) != -1) {
                 outputStream.write(buffer, 0, bytesRead);
             }
@@ -46,13 +48,42 @@ public class Loader {
         httpConn.disconnect();
     }
 
+    /*
+    Fetch data from ppl API
+     */
     public static JSONObject fetch() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("http://0.0.0.0:8088"))
+                .uri(URI.create("https://static-api.pepeland.org/resourcepack/latest.json"))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         return new JSONObject(response.body());
+    }
+
+    /*
+    Generate file SHA-256 checksum
+     */
+    public static String toSHA(String filePath) throws NoSuchAlgorithmException, IOException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        FileInputStream fis = new FileInputStream(filePath);
+
+        byte[] buffer = new byte[1024];
+        int bytesRead;
+        while ((bytesRead = fis.read(buffer)) != -1) {
+            digest.update(buffer, 0, bytesRead);
+        }
+        fis.close();
+
+        byte[] hashBytes = digest.digest();
+        StringBuilder hexString = new StringBuilder();
+        for (byte hashByte : hashBytes) {
+            String hex = Integer.toHexString(0xff & hashByte);
+            if (hex.length() == 1) {
+                hexString.append('0');
+            }
+            hexString.append(hex);
+        }
+        return hexString.toString();
     }
 }

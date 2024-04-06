@@ -34,5 +34,12 @@
 	},
 	"suggests": {
 		"yet_another_config_lib_v3": "*"
+	},
+	"custom": {
+		"modmenu": {
+			"links": {
+				"modmenu.discord": "https://discord.com/users/812990469482610729/"
+			}
+		}
 	}
 }
