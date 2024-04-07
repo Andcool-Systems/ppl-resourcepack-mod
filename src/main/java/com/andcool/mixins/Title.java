@@ -22,7 +22,7 @@ public abstract class Title extends Screen {
     @Inject(method = "render", at = @At("RETURN"))
     private void drawText(DrawContext context, int mouseX, int mouseY, float delta, CallbackInfo ci) {
         TextRenderer text_renderer = MinecraftClient.getInstance().textRenderer;
-        final MultilineText multilineText = MultilineText.create(textRenderer, Text.literal(MainClient.titleScreenMessage), width / 2);
+        final MultilineText multilineText = MultilineText.create(text_renderer, Text.literal(MainClient.titleScreenMessage), width / 2);
         multilineText.draw(context, 5, 5, 16, 0xffffff);
         //context.drawText(text_renderer, MainClient.titleScreenMessage, 5, 5, 0xffffff, false);
     }

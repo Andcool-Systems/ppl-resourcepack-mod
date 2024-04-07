@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.util.Objects;
 
 
 @Environment(EnvType.CLIENT)
@@ -33,11 +33,6 @@ public class MainClient implements ClientModInitializer {
         UserConfig.load();
 
         retries = UserConfig.RETRIES;
-        try {
-            rpManager.enable_in_otions("file/" + FILE_NAME); // enable resourcepack in options.txt if not
-        } catch (IOException e) {
-            LOGGER.error("Error:" + e);
-        }
         Thread downloadThread = new Thread(() -> {
             try {
                 titleScreenMessage = String.format("[%s] Получение информации о ресурспаке...", name);
@@ -48,41 +43,40 @@ public class MainClient implements ClientModInitializer {
                 String url = packData.getString("url");
                 String originalChecksum = packData.getString("checksum");
                 String date = packData.getJSONObject("lastModified").getString("ru");
+                boolean initiallyEnabled = rpManager.is_enabled("file/" + FILE_NAME);
                 if (version.equals(UserConfig.VERSION)) {
                     LOGGER.info("Pack already up to date");
                     titleScreenMessage = "";
                     return;
                 }
 
-                LOGGER.info("Downloading resourcepack...");
-                titleScreenMessage = String.format("[%s] Получение ресурспака...", name);
+                while (retries + 1 > 0) {
+                    LOGGER.info("Downloading resourcepack...");
+                    if (retries == UserConfig.RETRIES) {
+                        titleScreenMessage = String.format("[%s] Получение ресурспака...", name);
+                    }
 
-                rpManager.delete("./resourcepacks/" + FILE_NAME);  // Delete old resourcepack
-                Loader.download_file(url, "./resourcepacks/", FILE_NAME);  // Download new
-                String checksum = Loader.toSHA("./resourcepacks/" + FILE_NAME);
-                if (originalChecksum.equals(checksum)) {
-                    retries = 0;
-                }
-
-                while (retries > 0) {
-                    // If checksum didn't match
-                    titleScreenMessage = String.format("[%s] Не удалось получить пак (файл повреждён)\nОсталось попыток: %s", name, retries);
-                    rpManager.delete("./resourcepacks/" + FILE_NAME);
-                    Loader.download_file(url, "./resourcepacks/", FILE_NAME);
-                    checksum = Loader.toSHA("./resourcepacks/" + FILE_NAME);
+                    rpManager.delete("./resourcepacks/" + FILE_NAME);  // Delete old resourcepack
+                    Loader.download_file(url, "./resourcepacks/", FILE_NAME);  // Download new
+                    String checksum = Loader.toSHA("./resourcepacks/" + FILE_NAME);
                     if (originalChecksum.equals(checksum)) {
                         break;
                     }
                     LOGGER.warn("Checksums didn't math! Retrying...");
-                    retries--;
+                    --retries;
 
                     if (retries == 0) {
                         titleScreenMessage = String.format("[%s] Не удалось получить пак (файл повреждён)", name);
                         return;
+                    } else {
+                        titleScreenMessage = String.format("[%s] Не удалось получить пак (файл повреждён)\nОсталось попыток: %s", name, retries);
                     }
                 }
 
-                rpManager.enable_resourcepack_and_reload("file/" + FILE_NAME);  // Enable new resource pack
+                if (initiallyEnabled || Objects.equals(UserConfig.VERSION, "null")) {
+                    rpManager.enable_resourcepack_and_reload("file/" + FILE_NAME);  // Enable new resource pack
+                    rpManager.enable_in_otions("file/" + FILE_NAME); // enable resourcepack in options.txt if not
+                }
                 message = String.format("[%s] Ресурспак обновлён до версии %s (%s)", name, version, date);
                 titleScreenMessage = "";
 
