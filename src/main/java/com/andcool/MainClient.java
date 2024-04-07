@@ -15,6 +15,8 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 
 @Environment(EnvType.CLIENT)
 public class MainClient implements ClientModInitializer {
@@ -31,16 +33,21 @@ public class MainClient implements ClientModInitializer {
         UserConfig.load();
 
         retries = UserConfig.RETRIES;
+        try {
+            rpManager.enable_in_otions("file/" + FILE_NAME); // enable resourcepack in options.txt if not
+        } catch (IOException e) {
+            LOGGER.error("Error:" + e);
+        }
         Thread downloadThread = new Thread(() -> {
             try {
                 titleScreenMessage = String.format("[%s] Получение информации о ресурспаке...", name);
                 JSONObject apiResponse = Loader.fetch();  // Fetch resource pack data from API
-                JSONObject pack_data = apiResponse.getJSONObject(UserConfig.ONLY_EMOTES ? "emotes" : "main");
+                JSONObject packData = apiResponse.getJSONObject(UserConfig.ONLY_EMOTES ? "emotes" : "main");
 
-                String version = pack_data.getString("version");
-                String url = pack_data.getString("url");
-                String originalChecksum = pack_data.getString("checksum");
-                String date = pack_data.getJSONObject("lastModified").getString("ru");
+                String version = packData.getString("version");
+                String url = packData.getString("url");
+                String originalChecksum = packData.getString("checksum");
+                String date = packData.getJSONObject("lastModified").getString("ru");
                 if (version.equals(UserConfig.VERSION)) {
                     LOGGER.info("Pack already up to date");
                     titleScreenMessage = "";
