@@ -50,7 +50,7 @@ public class UserConfig {
                 }
             }
         } catch (Exception e) {
-            MainClient.LOGGER.error("Exception: " + e);
+            MainClient.LOGGER.warn("Exception: " + e);
             save();
         }
     }

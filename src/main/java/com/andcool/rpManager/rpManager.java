@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -21,7 +20,6 @@ public class rpManager {
     public static void enable_in_otions(String name) throws IOException {
         Path optionsFile = Path.of("./options.txt");
         List<String> lines = Files.readAllLines(optionsFile);
-        AtomicBoolean finded = new AtomicBoolean(false);
 
         for (int i = 0; i < lines.size(); i++) {
             if (lines.get(i).startsWith("resourcePacks:[")) {
@@ -31,11 +29,7 @@ public class rpManager {
                         .indexOf(']')).split(",");
 
                 List<String> newResourcePacks = new ArrayList<>(List.of(currentResourcePacks));
-                newResourcePacks.forEach(item -> {
-                    if (!finded.get())
-                        finded.set(item.contains(name));
-                });
-                if (finded.get()) {
+                if (is_enabled(name)) {
                     break;
                 }
                 newResourcePacks.add("\"" + name + "\"");
@@ -51,21 +45,19 @@ public class rpManager {
     public static boolean is_enabled(String name) throws IOException {
         Path optionsFile = Path.of("./options.txt");
         List<String> lines = Files.readAllLines(optionsFile);
-        AtomicBoolean finded = new AtomicBoolean(false);
+        boolean found = false;
         for (String line : lines) {
             if (line.startsWith("resourcePacks:[")) {
-                String[] currentResourcePacks = line.substring(line
-                        .indexOf('[') + 1, line
+                String new_line = line.replace("\"", "");
+                String[] currentResourcePacks = new_line.substring(new_line
+                        .indexOf('[') + 1, new_line
                         .indexOf(']')).split(",");
 
-                List.of(currentResourcePacks).forEach(item -> {
-                    if (!finded.get())
-                        finded.set(item.contains(name));
-                });
+                found = List.of(currentResourcePacks).contains(name);
                 break;
             }
         }
-        return finded.get();
+        return found;
     }
 
     public static void enable_resourcepack_and_reload(String name) {

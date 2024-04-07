@@ -24,11 +24,9 @@ public class Loader {
         URL url = new URL(fileURL);
         HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
         int responseCode = httpConn.getResponseCode();
-
         String saveFilePath = saveDir + File.separator + filename;
 
         if (responseCode == HttpURLConnection.HTTP_OK) {
-
             InputStream inputStream = httpConn.getInputStream();
             FileOutputStream outputStream = new FileOutputStream(saveFilePath);
 
