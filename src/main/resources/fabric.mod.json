@@ -2,7 +2,7 @@
 	"schemaVersion": 1,
 	"id": "pepeland_resourcepack",
 	"version": "${version}",
-	"name": "Pepeland resourcepack",
+	"name": "PPL pack updater",
 	"description": "Auto-update of the Pepeland resource pack",
 	"authors": [
 		"AndcoolSystems"

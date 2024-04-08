@@ -3,6 +3,7 @@ package com.andcool.loader;
 import com.andcool.MainClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.apache.logging.log4j.Level;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -39,9 +40,9 @@ public class Loader {
             outputStream.close();
             inputStream.close();
 
-            MainClient.LOGGER.info("Resourcepack downloaded successfully.");
+            MainClient.betterLog(Level.INFO, "Resourcepack downloaded successfully.");
         } else {
-            MainClient.LOGGER.error("No file to download. Server replied HTTP code: " + responseCode);
+            MainClient.betterLog(Level.ERROR, "No file to download. Server replied HTTP code: " + responseCode);
         }
         httpConn.disconnect();
     }

@@ -7,6 +7,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.resource.ResourcePackManager;
 import net.minecraft.resource.ResourcePackProfile;
+import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,9 +19,11 @@ import java.util.List;
 @Environment(EnvType.CLIENT)
 public class rpManager {
     public static void enable_in_otions(String name) throws IOException {
+        if (is_enabled(name)) {
+            return;
+        }
         Path optionsFile = Path.of("./options.txt");
         List<String> lines = Files.readAllLines(optionsFile);
-
         for (int i = 0; i < lines.size(); i++) {
             if (lines.get(i).startsWith("resourcePacks:[")) {
                 String currentResourcePacksLine = lines.get(i);
@@ -29,11 +32,7 @@ public class rpManager {
                         .indexOf(']')).split(",");
 
                 List<String> newResourcePacks = new ArrayList<>(List.of(currentResourcePacks));
-                if (is_enabled(name)) {
-                    break;
-                }
                 newResourcePacks.add("\"" + name + "\"");
-
                 String newResourcePacksLine = "resourcePacks:[" + String.join(",", newResourcePacks) + "]";
                 lines.set(i, newResourcePacksLine);
                 break;
@@ -67,7 +66,7 @@ public class rpManager {
 
         if (profile == null) return;
         resourcePackManager.enable(profile.getName());
-        MainClient.LOGGER.info("Reloading...");
+        MainClient.betterLog(Level.INFO, "Reloading...");
         resourcePackManager.scanPacks();
         MinecraftClient.getInstance().reloadResourcesConcurrently();
     }
@@ -75,9 +74,9 @@ public class rpManager {
     public static void delete(String path) {
         File file = new File(path);
         if (file.delete()) {
-            MainClient.LOGGER.info("Deleted old resourcepack");
+            MainClient.betterLog(Level.INFO, "Deleted old resourcepack");
             return;
         }
-        MainClient.LOGGER.warn("Failed to delete old resourcepack");
+        MainClient.betterLog(Level.WARN, "Failed to delete old resourcepack");
     }
 }

@@ -3,6 +3,7 @@ package com.andcool.config;
 import com.andcool.MainClient;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import org.apache.logging.log4j.Level;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -30,7 +31,7 @@ public class UserConfig {
             Files.createDirectories(configFile.toPath().getParent());
             Files.writeString(configFile.toPath(), jsonConfig.toString());
         } catch (IOException e) {
-            MainClient.LOGGER.error("IOException: " + e);
+            MainClient.betterLog(Level.ERROR, "IOException: " + e);
         }
     }
 

@@ -12,27 +12,33 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
 
 import java.util.Objects;
 
 
 @Environment(EnvType.CLIENT)
 public class MainClient implements ClientModInitializer {
-    public static String name = "Ppl updater";
-    public static final Logger LOGGER = LoggerFactory.getLogger(name);
+    public static String name = "PPL pack updater";
+    public static final Logger LOGGER = LogManager.getLogger(name);
     public static String FILE_NAME = "pepeland.zip";
     public static Boolean yetAnotherConfigLibV3 = FabricLoader.getInstance().getModContainer("yet_another_config_lib_v3").isPresent();
     public static String titleScreenMessage = "";
     private static String message = "";
     private static int retries = 2;
 
+    public static void betterLog(Level level, String message) {
+        LOGGER.log(level, String.format("[%s]: %s", name, message));
+    }
+
     @Override
     public void onInitializeClient() {
         UserConfig.load();
 
         retries = UserConfig.RETRIES;
+        betterLog(Level.WARN, "ЭТОТ МОД НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ [ПРОДУКТОМ/УСЛУГОЙ/СОБЫТИЕМ И т.п.] MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT");
         Thread downloadThread = new Thread(() -> {
             try {
                 titleScreenMessage = String.format("[%s] Получение информации о ресурспаке...", name);
@@ -45,13 +51,13 @@ public class MainClient implements ClientModInitializer {
                 String date = packData.getJSONObject("lastModified").getString("ru");
                 boolean initiallyEnabled = rpManager.is_enabled("file/" + FILE_NAME);
                 if (version.equals(UserConfig.VERSION)) {
-                    LOGGER.info("Pack already up to date");
+                    betterLog(Level.INFO, "Pack already up to date");
                     titleScreenMessage = "";
                     return;
                 }
 
                 while (retries + 1 > 0) {
-                    LOGGER.info("Downloading resourcepack...");
+                    betterLog(Level.INFO, "Downloading resourcepack...");
                     if (retries == UserConfig.RETRIES) {
                         titleScreenMessage = String.format("[%s] Получение ресурспака...", name);
                     }
@@ -62,7 +68,7 @@ public class MainClient implements ClientModInitializer {
                     if (originalChecksum.equals(checksum)) {
                         break;
                     }
-                    LOGGER.warn("Checksums didn't math! Retrying...");
+                    betterLog(Level.WARN, "Checksums didn't math! Retrying...");
                     --retries;
 
                     if (retries == 0) {
@@ -84,7 +90,7 @@ public class MainClient implements ClientModInitializer {
                 UserConfig.save();
 
             } catch (Exception e) {
-                LOGGER.error("Error:" + e);
+                betterLog(Level.ERROR, "Error:" + e);
                 titleScreenMessage = String.format("[%s] Не удалось скачать пак: %s", name, e);
             }
         });

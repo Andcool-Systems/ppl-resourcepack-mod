@@ -7,6 +7,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
+import org.apache.logging.log4j.Level;
 
 @Environment(EnvType.CLIENT)
 public class ConfigScreen {
@@ -19,7 +20,7 @@ public class ConfigScreen {
     }
 
     private static void save() {
-        MainClient.LOGGER.info("Saving settings...");
+        MainClient.betterLog(Level.INFO, "Saving settings...");
         UserConfig.save();
     }
 }
