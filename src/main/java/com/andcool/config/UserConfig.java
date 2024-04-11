@@ -1,10 +1,11 @@
 package com.andcool.config;
 
 import com.andcool.MainClient;
+import com.google.gson.JsonObject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.JsonHelper;
 import org.apache.logging.log4j.Level;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,11 +23,11 @@ public class UserConfig {
      */
     public static void save() {
         final File configFile = new File("config/pepeland/data.json");
-        JSONObject jsonConfig = new JSONObject();
-        jsonConfig.put("VERSION", VERSION);
-        jsonConfig.put("ENABLE", ENABLE);
-        jsonConfig.put("RETRIES", RETRIES);
-        jsonConfig.put("ONLY_SMILES", ONLY_EMOTES);
+        JsonObject jsonConfig = new JsonObject();
+        jsonConfig.addProperty("VERSION", VERSION);
+        jsonConfig.addProperty("ENABLE", ENABLE);
+        jsonConfig.addProperty("RETRIES", RETRIES);
+        jsonConfig.addProperty("ONLY_SMILES", ONLY_EMOTES);
         try {
             Files.createDirectories(configFile.toPath().getParent());
             Files.writeString(configFile.toPath(), jsonConfig.toString());
@@ -41,13 +42,13 @@ public class UserConfig {
     public static void load() {
         final File configFile = new File("config/pepeland/data.json");
         try {
-            JSONObject jsonConfig = new JSONObject(Files.readString(configFile.toPath()));
+            JsonObject jsonConfig = JsonHelper.deserialize(Files.readString(configFile.toPath()));
             for (String key : jsonConfig.keySet()) {
                 switch (key) {
-                    case "VERSION" -> VERSION = jsonConfig.getString(key);
-                    case "ENABLE" -> ENABLE = jsonConfig.getBoolean(key);
-                    case "RETRIES" -> RETRIES = jsonConfig.getInt(key);
-                    case "ONLY_SMILES" -> ONLY_EMOTES = jsonConfig.getBoolean(key);
+                    case "VERSION" -> VERSION = jsonConfig.get(key).getAsString();
+                    case "ENABLE" -> ENABLE = jsonConfig.get(key).getAsBoolean();
+                    case "RETRIES" -> RETRIES = jsonConfig.get(key).getAsInt();
+                    case "ONLY_SMILES" -> ONLY_EMOTES = jsonConfig.get(key).getAsBoolean();
                 }
             }
         } catch (Exception e) {

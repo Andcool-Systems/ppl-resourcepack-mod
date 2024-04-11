@@ -1,10 +1,11 @@
 package com.andcool.loader;
 
 import com.andcool.MainClient;
+import com.google.gson.JsonObject;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.JsonHelper;
 import org.apache.logging.log4j.Level;
-import org.json.JSONObject;
 
 import java.io.*;
 import java.net.HttpURLConnection;
@@ -50,14 +51,14 @@ public class Loader {
     /*
     Fetch data from ppl API
      */
-    public static JSONObject fetch() throws IOException, InterruptedException {
+    public static JsonObject fetch() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create("https://static-api.pepeland.org/resourcepack/latest.json"))
                 .build();
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        return new JSONObject(response.body());
+        return JsonHelper.deserialize(response.body());
     }
 
     /*

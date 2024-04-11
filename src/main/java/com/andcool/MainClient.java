@@ -3,6 +3,7 @@ package com.andcool;
 import com.andcool.config.UserConfig;
 import com.andcool.loader.Loader;
 import com.andcool.rpManager.rpManager;
+import com.google.gson.JsonObject;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -11,7 +12,6 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
@@ -42,13 +42,13 @@ public class MainClient implements ClientModInitializer {
         Thread downloadThread = new Thread(() -> {
             try {
                 titleScreenMessage = String.format("[%s] Получение информации о ресурспаке...", name);
-                JSONObject apiResponse = Loader.fetch();  // Fetch resource pack data from API
-                JSONObject packData = apiResponse.getJSONObject(UserConfig.ONLY_EMOTES ? "emotes" : "main");
+                JsonObject apiResponse = Loader.fetch();  // Fetch resource pack data from API
+                JsonObject packData = apiResponse.get(UserConfig.ONLY_EMOTES ? "emotes" : "main").getAsJsonObject();
 
-                String version = packData.getString("version");
-                String url = packData.getString("url");
-                String originalChecksum = packData.getString("checksum");
-                String date = packData.getJSONObject("lastModified").getString("ru");
+                String version = packData.get("version").getAsString();
+                String url = packData.get("url").getAsString();
+                String originalChecksum = packData.get("checksum").getAsString();
+                String date = packData.get("lastModified").getAsJsonObject().get("ru").getAsString();
                 boolean initiallyEnabled = rpManager.is_enabled("file/" + FILE_NAME);
                 if (version.equals(UserConfig.VERSION)) {
                     betterLog(Level.INFO, "Pack already up to date");
