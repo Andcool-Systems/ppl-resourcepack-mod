@@ -16,6 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
 
+import java.io.File;
 import java.util.Objects;
 
 
@@ -50,7 +51,10 @@ public class MainClient implements ClientModInitializer {
                 String originalChecksum = packData.get("checksum").getAsString();
                 String date = packData.get("lastModified").getAsJsonObject().get("ru").getAsString();
                 boolean initiallyEnabled = rpManager.is_enabled("file/" + FILE_NAME);
-                if (version.equals(UserConfig.VERSION)) {
+                File file = new File("./resourcepacks/" + FILE_NAME);
+                if (version.equals(UserConfig.VERSION) &&
+                    file.exists() &&
+                    originalChecksum.equals(Loader.toSHA("./resourcepacks/" + FILE_NAME))) {
                     betterLog(Level.INFO, "Pack already up to date");
                     titleScreenMessage = "";
                     return;

@@ -43,16 +43,12 @@ public class UserConfig {
         final File configFile = new File("config/pepeland/data.json");
         try {
             JsonObject jsonConfig = JsonHelper.deserialize(Files.readString(configFile.toPath()));
-            for (String key : jsonConfig.keySet()) {
-                switch (key) {
-                    case "VERSION" -> VERSION = jsonConfig.get(key).getAsString();
-                    case "ENABLE" -> ENABLE = jsonConfig.get(key).getAsBoolean();
-                    case "RETRIES" -> RETRIES = jsonConfig.get(key).getAsInt();
-                    case "ONLY_SMILES" -> ONLY_EMOTES = jsonConfig.get(key).getAsBoolean();
-                }
-            }
-        } catch (Exception e) {
-            MainClient.LOGGER.warn("Exception: " + e);
+            VERSION = jsonConfig.get("VERSION").getAsString();
+            ENABLE = jsonConfig.get("ENABLE").getAsBoolean();
+            RETRIES = jsonConfig.get("RETRIES").getAsInt();
+            ONLY_EMOTES = jsonConfig.get("ONLY_SMILES").getAsBoolean();
+        } catch (IOException e) {
+            MainClient.betterLog(Level.WARN, "IOException: " + e);
             save();
         }
     }

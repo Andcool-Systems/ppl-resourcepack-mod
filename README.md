@@ -1,4 +1,6 @@
 ## Ppl Pack Updater
+> [!NOTE]
+> The project uses the GNU GPL v3.0 license and all third-party projects that in one way or another use parts of the code (including API) must be distributed according to the rules of the GNU GPL v3.0 license
 ### En
 Most players on the [Pepeland](https://pepeland.net/) server use the [official resource pack](https://pepeland.net/wiki/game/resourcepack), which is available on the server's website. However, often updates to the resource pack are released quietly, and it's easy to miss them. You might only notice the update when you see someone with a pumpkin on their head saying, "Yeah, this is a hat." This issue has frustrated many players because they have to go back to the website to download and replace files in the resource pack folder. I myself went for a long time with a resource pack version 4 updates behind simply because I didn't know. For many, it's just too much hassle to update them.
 

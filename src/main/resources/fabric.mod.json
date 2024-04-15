@@ -7,8 +7,10 @@
 	"authors": [
 		"AndcoolSystems"
 	],
+	"contributors": ["WavyCat", "Kel Cuprum"],
 	"contact": {
-		"homepage": "https://pepeland.net/"
+		"homepage": "https://pepeland.net/",
+		"issues": "https://github.com/Andcool-Systems/ppl-resourcepack-mod/issues"
 	},
 	"icon": "assets/ppl/icon.png",
 	"environment": "client",
