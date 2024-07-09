@@ -84,8 +84,8 @@ public class MainClient implements ClientModInitializer {
                 }
 
                 if (initiallyEnabled || Objects.equals(UserConfig.VERSION, "null")) {
-                    rpManager.enable_resourcepack_and_reload("file/" + FILE_NAME);  // Enable new resource pack
                     rpManager.enable_in_otions("file/" + FILE_NAME); // enable resourcepack in options.txt if not
+                    rpManager.enable_resourcepack_and_reload("file/" + FILE_NAME);  // Enable new resource pack
                 }
                 message = String.format("[%s] Ресурспак обновлён до версии %s (%s)", name, version, date);
                 titleScreenMessage = "";

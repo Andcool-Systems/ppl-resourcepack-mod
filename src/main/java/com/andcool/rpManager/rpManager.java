@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Environment(EnvType.CLIENT)
@@ -23,6 +22,9 @@ public class rpManager {
         if (is_enabled(name)) {
             return;
         }
+        File file = new File("./options.txt");
+        if (!file.exists()) return;
+
         Path optionsFile = Path.of("./options.txt");
         List<String> lines = Files.readAllLines(optionsFile);
         for (int i = 0; i < lines.size(); i++) {
@@ -43,6 +45,9 @@ public class rpManager {
     }
 
     public static boolean is_enabled(String name) throws IOException {
+        File file = new File("./options.txt");
+        if (!file.exists()) return true;
+
         Path optionsFile = Path.of("./options.txt");
         List<String> lines = Files.readAllLines(optionsFile);
         boolean found = false;
@@ -66,10 +71,10 @@ public class rpManager {
         ResourcePackProfile profile = resourcePackManager.getProfile(name);
 
         if (profile == null) return;
-        resourcePackManager.enable(profile.getName());
+        resourcePackManager.enable(profile.getId());
         MainClient.betterLog(Level.INFO, "Reloading...");
         resourcePackManager.scanPacks();
-        MinecraftClient.getInstance().reloadResourcesConcurrently();
+        MinecraftClient.getInstance().reloadResources();
     }
 
     public static void delete(String path) {
