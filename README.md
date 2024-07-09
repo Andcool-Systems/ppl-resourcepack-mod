@@ -1,4 +1,5 @@
 ## Ppl Pack Updater
+[![Made for pepeland](https://andcool.ru/static/badges/made-for-ppl.svg)](https://pepeland.net)
 > [!NOTE]
 > The project uses the GNU GPL v3.0 license and all third-party projects that in one way or another use parts of the code (including API) must be distributed according to the rules of the GNU GPL v3.0 license
 ### En
