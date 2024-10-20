@@ -14,6 +14,9 @@ import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -24,28 +27,18 @@ public class Loader {
      */
     public static void download_file(String fileURL, String saveDir, String filename) throws IOException {
         URL url = new URL(fileURL);
-        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
-        int responseCode = httpConn.getResponseCode();
         String saveFilePath = saveDir + File.separator + filename;
 
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            InputStream inputStream = httpConn.getInputStream();
-            FileOutputStream outputStream = new FileOutputStream(saveFilePath);
+        try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
+             FileOutputStream fileOutputStream = new FileOutputStream(saveFilePath);
+             FileChannel fileChannel = fileOutputStream.getChannel()) {
 
-            int bytesRead;
-            byte[] buffer = new byte[1024];
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            outputStream.close();
-            inputStream.close();
-
+            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
             MainClient.betterLog(Level.INFO, "Resourcepack downloaded successfully.");
-        } else {
-            MainClient.betterLog(Level.ERROR, "No file to download. Server replied HTTP code: " + responseCode);
+
+        } catch (IOException e) {
+            MainClient.betterLog(Level.ERROR, "Failed to download pack: " + e.toString());
         }
-        httpConn.disconnect();
     }
 
     /*

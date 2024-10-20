@@ -11,14 +11,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
-import org.jetbrains.annotations.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Level;
 
 import java.io.File;
 import java.util.Objects;
-
 
 @Environment(EnvType.CLIENT)
 public class MainClient implements ClientModInitializer {
@@ -104,7 +102,7 @@ public class MainClient implements ClientModInitializer {
         }
     }
 
-    private void onClientStarted(@NotNull MinecraftClient client) {
+    private void onClientStarted(MinecraftClient client) {
         if (client.world != null && !message.isEmpty() && client.inGameHud != null) {
             client.inGameHud.getChatHud().addMessage(Text.of(message));
             message = "";
