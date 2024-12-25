@@ -7,9 +7,12 @@ import com.google.gson.JsonObject;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.TitleScreen;
 import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -27,6 +30,8 @@ public class MainClient implements ClientModInitializer {
     private static String message = "";
     private static int retries = 2;
     private static boolean working = false;
+    private static boolean firstload = true;
+
 
     public static void betterLog(Level level, String message) {
         LOGGER.log(level, String.format("[%s]: %s", name, message));
@@ -34,12 +39,17 @@ public class MainClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        UserConfig.load();
+        ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            if (screen instanceof TitleScreen && firstload) {
+                firstload = false;
+                UserConfig.load();
 
-        if (UserConfig.ENABLE) {
-            downloadPack();
-            ClientTickEvents.START_CLIENT_TICK.register(this::onClientStarted);
-        }
+                if (UserConfig.ENABLE) {
+                    downloadPack();
+                    ClientTickEvents.START_CLIENT_TICK.register(this::onClientStarted);
+                }
+            }
+        });
     }
 
     public static void downloadPack() {

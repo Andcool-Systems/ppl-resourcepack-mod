@@ -1,7 +1,7 @@
 {
 	"schemaVersion": 1,
 	"id": "pepeland_resourcepack",
-	"version": "ppl-pack-updater-0.0.3.1-1.21.1",
+	"version": "${version}",
 	"name": "PPL pack updater",
 	"description": "Auto-update of the Pepeland resource pack",
 	"authors": [
@@ -27,8 +27,8 @@
 		"ppl.mixin.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.7",
-		"minecraft": "~1.21.1",
+		"fabricloader": ">=0.16.9",
+		"minecraft": "~1.21.3",
 		"java": ">=21",
 		"fabric-api": "*"
 	},
