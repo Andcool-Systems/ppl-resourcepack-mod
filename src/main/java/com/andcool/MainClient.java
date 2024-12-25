@@ -22,11 +22,11 @@ import java.util.Objects;
 public class MainClient implements ClientModInitializer {
     public static String name = "PPL pack updater";
     public static final Logger LOGGER = LogManager.getLogger(name);
-    public static String FILE_NAME = "pepeland.zip";
     public static Boolean yetAnotherConfigLibV3 = FabricLoader.getInstance().getModContainer("yet_another_config_lib_v3").isPresent();
     public static String titleScreenMessage = "";
     private static String message = "";
     private static int retries = 2;
+    private static boolean working = false;
 
     public static void betterLog(Level level, String message) {
         LOGGER.log(level, String.format("[%s]: %s", name, message));
@@ -36,10 +36,19 @@ public class MainClient implements ClientModInitializer {
     public void onInitializeClient() {
         UserConfig.load();
 
+        if (UserConfig.ENABLE) {
+            downloadPack();
+            ClientTickEvents.START_CLIENT_TICK.register(this::onClientStarted);
+        }
+    }
+
+    public static void downloadPack() {
         retries = UserConfig.RETRIES;
-        betterLog(Level.WARN, "ЭТОТ МОД НЕ ЯВЛЯЕТСЯ ОФИЦИАЛЬНЫМ [ПРОДУКТОМ/УСЛУГОЙ/СОБЫТИЕМ И т.п.] MINECRAFT. НЕ ОДОБРЕНО И НЕ СВЯЗАНО С КОМПАНИЕЙ MOJANG ИЛИ MICROSOFT");
         Thread downloadThread = new Thread(() -> {
             try {
+                if (MainClient.working) return;
+                MainClient.working = true;
+
                 titleScreenMessage = String.format("[%s] Получение информации о ресурспаке...", name);
                 JsonObject apiResponse = Loader.fetch();  // Fetch resource pack data from API
                 JsonObject packData = apiResponse.get(UserConfig.ONLY_EMOTES ? "emotes" : "main").getAsJsonObject();
@@ -48,11 +57,17 @@ public class MainClient implements ClientModInitializer {
                 String url = packData.get("url").getAsString();
                 String originalChecksum = packData.get("checksum").getAsString();
                 String date = packData.get("lastModified").getAsJsonObject().get("ru").getAsString();
-                boolean initiallyEnabled = rpManager.is_enabled("file/" + FILE_NAME);
-                File file = new File("./resourcepacks/" + FILE_NAME);
-                if (version.equals(UserConfig.VERSION) &&
-                    file.exists() &&
-                    originalChecksum.equals(Loader.toSHA("./resourcepacks/" + FILE_NAME))) {
+
+                String filename = String.format("pepeland_%s_%s.zip", version, UserConfig.ONLY_EMOTES ? "emotes" : "main");
+
+                boolean initiallyEnabled = rpManager.is_enabled();
+                File file = new File("./resourcepacks/" + filename);
+
+                if (
+                        version.equals(UserConfig.VERSION) &&
+                        file.exists() &&
+                        originalChecksum.equals(Loader.toSHA("./resourcepacks/" + filename))
+                ) {
                     betterLog(Level.INFO, "Pack already up to date");
                     titleScreenMessage = "";
                     return;
@@ -64,9 +79,8 @@ public class MainClient implements ClientModInitializer {
                         titleScreenMessage = String.format("[%s] Получение ресурспака...", name);
                     }
 
-                    rpManager.delete("./resourcepacks/" + FILE_NAME);  // Delete old resourcepack
-                    Loader.download_file(url, "./resourcepacks/", FILE_NAME);  // Download new
-                    String checksum = Loader.toSHA("./resourcepacks/" + FILE_NAME);
+                    Loader.download_file(url, "./resourcepacks/", filename);  // Download new
+                    String checksum = Loader.toSHA("./resourcepacks/" + filename);
                     if (originalChecksum.equals(checksum)) {
                         break;
                     }
@@ -82,8 +96,8 @@ public class MainClient implements ClientModInitializer {
                 }
 
                 if (initiallyEnabled || Objects.equals(UserConfig.VERSION, "null")) {
-                    rpManager.enable_in_otions("file/" + FILE_NAME); // enable resourcepack in options.txt if not
-                    rpManager.enable_resourcepack_and_reload("file/" + FILE_NAME);  // Enable new resource pack
+                    rpManager.disableAll();  // Disable older resourcepacks
+                    rpManager.enable_resourcepack_and_reload(filename);  // Enable new resource pack
                 }
                 message = String.format("[%s] Ресурспак обновлён до версии %s (%s)", name, version, date);
                 titleScreenMessage = "";
@@ -93,14 +107,15 @@ public class MainClient implements ClientModInitializer {
 
             } catch (Exception e) {
                 betterLog(Level.ERROR, "Error:" + e);
-                titleScreenMessage = String.format("[%s] Не удалось скачать пак: %s", name, e);
+                titleScreenMessage = String.format("[%s] Не удалось скачать пак", name);
+            } finally {
+                MainClient.working = false;
             }
         });
-        if (UserConfig.ENABLE) {
-            downloadThread.start();  // Start background thread
-            ClientTickEvents.START_CLIENT_TICK.register(this::onClientStarted);
-        }
+
+        downloadThread.start();  // Start background thread
     }
+
 
     private void onClientStarted(MinecraftClient client) {
         if (client.world != null && !message.isEmpty() && client.inGameHud != null) {

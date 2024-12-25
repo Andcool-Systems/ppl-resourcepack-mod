@@ -16,9 +16,6 @@
 	"license": "GNU GPL v3.0",
 	"environment": "client",
 	"entrypoints": {
-		"main": [
-			"com.andcool.Main"
-		],
 		"client": [
 			"com.andcool.MainClient"
 		],

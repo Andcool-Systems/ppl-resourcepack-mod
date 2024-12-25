@@ -19,9 +19,7 @@ public class MainConfig {
         category.option(Option.createBuilder(boolean.class)
                 .description(OptionDescription.createBuilder().text(Text.of("Текущая версия ресурспака")).build())
                 .name(Text.of("Текущая версия: " + UserConfig.VERSION))
-                .binding(false, () -> {
-                    return false;
-                }, newVal -> {
+                .binding(false, () -> false, newVal -> {
                 })
                 .controller(BooleanControllerBuilderImpl::new)
                 .available(false)
@@ -31,7 +29,10 @@ public class MainConfig {
                         .text(Text.of("Проверять наличие обновлений и обновлять ресурспак при каждом входе в Minecraft."))
                         .build())
                 .name(Text.of("Включить автообновление"))
-                .binding(true, () -> UserConfig.ENABLE, newVal -> UserConfig.ENABLE = newVal)
+                .binding(true, () -> UserConfig.ENABLE, (newVal) -> {
+                    UserConfig.ENABLE = newVal;
+                    UserConfig.dirty = true;
+                })
                 .controller(BooleanControllerBuilderImpl::new)
                 .build());
         category.option(Option.createBuilder(boolean.class)
@@ -41,7 +42,8 @@ public class MainConfig {
                 .name(Text.of("Только смайлы"))
                 .binding(false, () -> UserConfig.ONLY_EMOTES, newVal -> {
                     UserConfig.ONLY_EMOTES = newVal;
-                    UserConfig.VERSION = "null";  // Сбрасываем версию, что бы в случае чего они не наложились друг на друга
+                    UserConfig.VERSION = "null";
+                    UserConfig.dirty = true;
                 })
                 .controller(BooleanControllerBuilderImpl::new)
                 .build());

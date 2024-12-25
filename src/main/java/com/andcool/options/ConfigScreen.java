@@ -22,5 +22,10 @@ public class ConfigScreen {
     private static void save() {
         MainClient.betterLog(Level.INFO, "Saving settings...");
         UserConfig.save();
+
+        if (UserConfig.dirty) {
+            MainClient.downloadPack();
+            UserConfig.dirty = false;
+        }
     }
 }

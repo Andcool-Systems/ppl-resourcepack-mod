@@ -17,6 +17,7 @@ public class UserConfig {
     public static boolean ENABLE = true;
     public static int RETRIES = 2;
     public static boolean ONLY_EMOTES = false;
+    public static boolean dirty = false;
 
     /*
     Save config to file

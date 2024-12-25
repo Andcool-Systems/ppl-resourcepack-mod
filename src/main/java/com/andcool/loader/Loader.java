@@ -27,18 +27,28 @@ public class Loader {
      */
     public static void download_file(String fileURL, String saveDir, String filename) throws IOException {
         URL url = new URL(fileURL);
+        HttpURLConnection httpConn = (HttpURLConnection) url.openConnection();
+        int responseCode = httpConn.getResponseCode();
         String saveFilePath = saveDir + File.separator + filename;
 
-        try (ReadableByteChannel readableByteChannel = Channels.newChannel(url.openStream());
-             FileOutputStream fileOutputStream = new FileOutputStream(saveFilePath);
-             FileChannel fileChannel = fileOutputStream.getChannel()) {
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            InputStream inputStream = httpConn.getInputStream();
+            FileOutputStream outputStream = new FileOutputStream(saveFilePath);
 
-            fileChannel.transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-            MainClient.betterLog(Level.INFO, "Resourcepack downloaded successfully.");
+            int bytesRead;
+            byte[] buffer = new byte[1024];
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
 
-        } catch (IOException e) {
-            MainClient.betterLog(Level.ERROR, "Failed to download pack: " + e.toString());
+            outputStream.close();
+            inputStream.close();
+
+            MainClient.betterLog(Level.DEBUG, "Resourcepack downloaded successfully.");
+        } else {
+            MainClient.betterLog(Level.ERROR, "No file to download. Server replied HTTP code: " + responseCode);
         }
+        httpConn.disconnect();
     }
 
     /*
